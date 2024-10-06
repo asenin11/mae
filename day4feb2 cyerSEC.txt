@@ -246,6 +246,8 @@ EX.2 CREATE A FIREWALL POLICY NAMED PROWEBAPP2 TO OPEN
 WWW.WEB8.COM HAS HTTPS AS OPEN
 WWW.WEB9.COM HAS HTTPS OPEN
 formula:       PROTOCOL    HACKER    VICTIM     PORT:
+
+       tcp, udp, icmp, IP    any    web8, web9
 config t
 no ip access-list extended PROWEBAPP2
 ip access-list extended PROWEBAPP2
@@ -255,23 +257,24 @@ Interface Gi 3
  ip access-group PROWEBAPP2 in
  do sh ip access-list PROWEBAPP1
 
-EX.4 CREATE A FIREWALL POLICY NAMED PROWEBAPP4 TO OPEN
+EX.4 CREATE A FIREWALL POLICY NAMED ProtectWEB1 TO OPEN
 WWW.WEB8.COM HAS ping, dns, https OPEN
-WWW.WEB9.COM HAS everything OPEN!
+WWW.WEB9.COM HAS ssh, http, open
 config t
-no ip access-list extended PROWEBAPP4
-ip access-list extended PROWEBAPP4
-Permit icmp any host www.web8.com
-Permit tcp any host www.web8.com eq 53
-Permit tcp any host www.web8.com eq 443
-Permit IP any host www.web9.com
+no ip access-list extended ProtectWEB1
+ip access-list extended ProtectWEB1
+Permit tcp any host www.web8.com eq 53 log
+Permit tcp any host www.web8.com eq 443 log
+Permit tcp any host www.web9.com eq 22 log
+Permit tcp any host www.web9.com eq 80 log
+Permit icmp any host www.web9.com
 Interface Gi 3
- ip access-group PROWEBAPP4 in
- do sh ip access-list PROWEBAPP4
+ ip access-group ProtectWEB1 in
+ do sh ip access-list ProtectWEB1
 
-EX.5 CREATE A FIREWALL POLICY NAMED LASTFWP TO OPEN
-WWW.WEB8.COM HAS ping, chargen, finger, http as Open
-WWW.WEB9.COM HAS ssh, telnet, daytime, dns, https as Open:
+EX.5 CREATE A FIREWALL POLICY NAMED LASTFWP2 TO OPEN
+WWW.WEB8.COM HAS http, https as Open
+WWW.WEB9.COM HAS ssh, telnet, dns, as Open:
 if you canNOT make the Policy, you work in Jollibee.
 config t
 Interface Gi 3
@@ -304,8 +307,8 @@ no access-list 7
 access-list 7 permit 192.168.102.0 0.0.0.255
 access-list 7 permit 192.168.103.0 0.0.0.255
 ip nat inside source list 7 interface Gi 1 overload
-ip nat inside source static 192.168.102.69 192.168.108.69
-ip nat inside source static 192.168.103.88 192.168.108.88
+ip nat inside source static 192.168.102.11 192.168.108.69
+ip nat inside source static 192.168.103.12 192.168.108.88
 end
 
 TASK10: DO YOU HAVE TO REPLACED BY A.I AT WORK? REPLACED BY
@@ -313,6 +316,54 @@ YOUNGER, SMARTER, CHEAPER NEW HIRES?? HOW TO BE UNTOUCHABLE EMPLOYEE?
 IF YOU WANT HAYUP/SIX DIGITS SWELDO/untouchable status.
 you need HAYUP/SIX DIGITS SWELDO Habits.
 
+config t
+NO ip access-list standard WITHSALAMIN
+ip access-list standard WITHSALAMIN
+DENY 10.21.0.0 0.0.255.255
+DENY 10.22.0.0 0.0.255.255
+DENY 10.41.0.0 0.0.255.255
+DENY 10.42.0.0 0.0.255.255
+DENY 10.51.0.0 0.0.255.255
+DENY 10.61.0.0 0.0.255.255
+DENY 10.62.0.0 0.0.255.255
+DENY 10.71.0.0 0.0.255.255
+Permit Any
+Int Gi 0/0/1
+ ip access-group WITHSALAMIN in
+ end
+--------------------------------------
+config t
+NO ip access-list standard NOSALAMIN
+ip access-list standard NOSALAMIN
+PERMIT 10.11.0.0 0.0.255.255
+PERMIT 10.12.0.0 0.0.255.255
+PERMIT 10.31.0.0 0.0.255.255
+PERMIT 10.32.0.0 0.0.255.255
+PERMIT 10.52.0.0 0.0.255.255
+Permit Any
+Int Gi 0/0/1
+ ip access-group NOSALAMIN in
+ end
+--------------------------------------
+config t
+no ip access-list extended LASTFWP3
+ip access-list extended LASTFWP3
+Permit tcp any host www.web8.com eq 443 log
+Permit tcp any host www.web9.com eq 22 log
+Interface Gi 3
+ ip access-group LASTFWP3 in
+ do sh ip access-list LASTFWP3
+
+------------------------------------
+BLDG1
+sudo su
+ifconfig eth0 192.168.103.16 netmask 255.255.255.0 up
+route add default gw 192.168.103.8
+
+BLDG2
+sudo su
+ifconfig eth0 192.168.103.12 netmask 255.255.255.0 up
+route add default gw 192.168.103.8
 
 
 
